@@ -1,0 +1,155 @@
+---
+import { nav, offices, site } from '../../data/site';
+
+const links = [...nav, { label: 'Contact', href: '/#contact' }];
+---
+
+<footer class="site-footer">
+	<div class="wrap">
+		<div class="upper">
+			<nav aria-label="Footer">
+				<ul class="links">
+					{
+						links.map((item) => (
+							<li>
+								<a href={item.href}>
+									{item.label}
+									<svg class="arrow" viewBox="0 0 12 12" aria-hidden="true">
+										<path
+											d="M3 9 9 3M4.25 3H9v4.75"
+											fill="none"
+											stroke="currentColor"
+											stroke-width="1.25"
+											stroke-linecap="round"
+											stroke-linejoin="round"
+										/>
+									</svg>
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</nav>
+			<div class="aside">
+				<p class="note">{site.footerNote}</p>
+
+				<a class="mail" href={`mailto:${site.email}`}>{site.email}</a>
+			</div>
+		</div>
+		<a class="mark" href="/#top">
+			<img src="/marq%20logo%20white.png" alt={site.name} width="2038" height="859" />
+		</a>
+		<p class="legal">{site.copyright}</p>
+	</div>
+</footer>
+
+<style>
+	.site-footer {
+		background: var(--color-surface-footer);
+		color: var(--color-on-dark);
+		padding-top: clamp(3.5rem, 8vw, 6.5rem);
+		overflow: hidden;
+	}
+
+	.site-footer a {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.upper {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 2.5rem 4rem;
+	}
+
+	.links {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.85rem 1.75rem;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.links a {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+		font-size: clamp(1.05rem, 1.5vw, 1.25rem);
+		font-weight: 600;
+		letter-spacing: -0.01em;
+	}
+
+	.links a:hover,
+	.mail:hover,
+	.mark:hover {
+		opacity: 0.72;
+	}
+
+	.arrow {
+		width: 0.72em;
+		height: 0.72em;
+		flex: none;
+	}
+
+	.aside {
+		display: grid;
+		gap: 0.85rem;
+		justify-items: start;
+		font-size: clamp(1.05rem, 1.5vw, 1.2rem);
+		font-weight: 600;
+		line-height: 1.4;
+	}
+
+	.note {
+		margin: 0;
+		max-width: 18rem;
+		color: var(--color-on-dark-muted);
+		font-size: 0.95rem;
+		font-weight: 500;
+	}
+
+	.places {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.legal {
+		margin-bottom : 10px;
+		text-align: right;
+		font-size: 0.75rem;
+		font-weight: 500;
+		letter-spacing: 0.01em;
+		color: var(--color-on-dark-muted);
+	}
+
+	.mark {
+		position: relative;
+		display: block;
+		width: min(100%, 34rem);
+		aspect-ratio: 1762 / 508;
+		overflow: hidden;
+		margin-bottom: clamp(1.25rem, 3vw, 2rem);
+	}
+
+	.mark img {
+		position: absolute;
+		width: 115.66%;
+		height: 169.09%;
+		max-width: none;
+		left: -7.83%;
+		top: -32.68%;
+	}
+
+	@media (max-width: 40rem) {
+		.upper {
+			flex-direction: column;
+		}
+
+		.legal {
+			text-align: left;
+		}
+	}
+</style>

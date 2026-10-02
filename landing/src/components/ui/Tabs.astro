@@ -1,0 +1,221 @@
+---
+import Media from './Media.astro';
+import type { ServiceTab } from '../../data/services';
+
+interface Props {
+	tabs: ServiceTab[];
+	label: string;
+}
+
+const { tabs, label } = Astro.props;
+---
+
+<div class="tabs-root" data-tabs data-reveal>
+	<div class="tabs" role="tablist" aria-orientation="vertical" aria-label={label}>
+		{
+			tabs.map((tab, index) => (
+				<button
+					type="button"
+					role="tab"
+					id={`b-${tab.id}`}
+					aria-selected={index === 0 ? 'true' : 'false'}
+					aria-controls={`t-${tab.id}`}
+					tabindex={index === 0 ? 0 : -1}
+				>
+					{tab.label}
+				</button>
+			))
+		}
+	</div>
+	{
+		tabs.map((tab, index) => (
+			<div
+				class="panel"
+				role="tabpanel"
+				id={`t-${tab.id}`}
+				aria-labelledby={`b-${tab.id}`}
+				hidden={index !== 0}
+			>
+				<figure>
+					<Media image={tab.image} width={1200} height={800} />
+				</figure>
+				<div class="examples">
+					<ul>
+						{tab.items.map((item) => (
+							<li>
+								{item.name}
+								{item.detail && <small>{item.detail}</small>}
+							</li>
+						))}
+					</ul>
+				</div>
+			</div>
+		))
+	}
+</div>
+
+<script is:inline>
+	(function () {
+		const roots = document.querySelectorAll('[data-tabs]');
+		roots.forEach((root) => {
+			const tabButtons = [...root.querySelectorAll('[role="tab"]')];
+			function select(tab) {
+				tabButtons.forEach((item) => {
+					const on = item === tab;
+					item.setAttribute('aria-selected', on ? 'true' : 'false');
+					item.tabIndex = on ? 0 : -1;
+					const panelId = item.getAttribute('aria-controls');
+					const panel = panelId ? document.getElementById(panelId) : null;
+					if (panel) panel.hidden = !on;
+				});
+			}
+			tabButtons.forEach((tab, index) => {
+				tab.addEventListener('click', () => select(tab));
+				tab.addEventListener('keydown', (event) => {
+					let next = null;
+					if (event.key === 'ArrowRight' || event.key === 'ArrowDown') next = index + 1;
+					else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') next = index - 1;
+					else if (event.key === 'Home') next = 0;
+					else if (event.key === 'End') next = tabButtons.length - 1;
+					if (next === null) return;
+					event.preventDefault();
+					const wrapped = (next + tabButtons.length) % tabButtons.length;
+					select(tabButtons[wrapped]);
+					tabButtons[wrapped].focus();
+				});
+			});
+		});
+	})();
+</script>
+
+<style>
+	.tabs-root {
+		margin-top: 2.75rem;
+	}
+
+	.tabs {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.tabs button {
+		font: 500 clamp(1.75rem, 3vw, 2.5rem) var(--font-sans);
+		letter-spacing: -0.02em;
+		line-height: 1.15;
+		text-align: left;
+		color: var(--color-on-dark-muted);
+		background: transparent;
+		border: 0;
+		border-bottom: 1px solid color-mix(in srgb, var(--color-on-dark) 14%, transparent);
+		padding: 0.9rem 0;
+		cursor: pointer;
+	}
+
+	.tabs button[aria-selected='true'] {
+		color: var(--color-on-dark);
+		font-weight: 600;
+		padding-left: 0.85rem;
+		box-shadow: inset 3px 0 0 var(--color-on-dark);
+	}
+
+	.tabs button:hover {
+		color: var(--color-on-dark);
+	}
+
+	.panel {
+		display: flex;
+		flex-direction: column;
+		margin-top: 1.75rem;
+		border-radius: 1.125rem;
+		overflow: hidden;
+		background: color-mix(in srgb, var(--color-on-dark) 8%, transparent);
+	}
+
+	.panel[hidden] {
+		display: none;
+	}
+
+	.panel figure {
+		margin: 0;
+		aspect-ratio: 16 / 10;
+		min-height: 14rem;
+	}
+
+	.panel figure :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.examples {
+		padding: 1rem 1.1rem 1.15rem;
+	}
+
+	.examples-label {
+		margin: 0 0 0.7rem;
+		font-size: 0.75rem;
+		font-weight: 500;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--color-on-dark-muted);
+	}
+
+	.examples ul {
+		list-style: none;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		margin: 0;
+		padding: 0;
+	}
+
+	.examples li {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		color: var(--color-on-dark);
+		font-size: 0.9375rem;
+		font-weight: 500;
+		line-height: 1.35;
+	}
+
+	.examples li:not(:last-child)::after {
+		content: '';
+		width: 1px;
+		height: 0.9em;
+		margin-inline: 0.85rem;
+		background: rgb(255 255 255 / 0.35);
+	}
+
+	.examples li small {
+		font-size: 0.75rem;
+		font-weight: 400;
+		color: var(--color-on-dark-muted);
+	}
+
+	@media (min-width: 54rem) {
+		.tabs-root {
+			display: grid;
+			grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr);
+			gap: clamp(2rem, 5vw, 4rem);
+			align-items: stretch;
+		}
+
+		.panel {
+			grid-column: 2;
+			grid-row: 1;
+			height: 100%;
+			margin-top: 0;
+		}
+
+		.panel figure {
+			flex: 1 1 auto;
+			aspect-ratio: auto;
+			min-height: 16rem;
+		}
+	}
+
+	img {
+		max-height : 400px;
+	}
+</style>

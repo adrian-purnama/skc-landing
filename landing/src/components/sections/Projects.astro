@@ -1,0 +1,28 @@
+---
+import Button from '../ui/Button.astro';
+import ProjectCard from '../ui/ProjectCard.astro';
+import ProjectGrid from '../ui/ProjectGrid.astro';
+import SectionHeading from '../ui/SectionHeading.astro';
+import { featuredProjects, loadProjects } from '../../lib/projects';
+
+const featured = featuredProjects(loadProjects());
+---
+
+<section class="section-soft" id="projects" aria-labelledby="projects-heading">
+	<div class="wrap">
+		<SectionHeading id="projects-heading" title="Featured projects" layout="center" />
+		<ProjectGrid>
+			{featured.map((project) => <ProjectCard project={project} />)}
+		</ProjectGrid>
+		<p class="more">
+			<Button href="/projects">See all of our projects</Button>
+		</p>
+	</div>
+</section>
+
+<style>
+	.more {
+		margin: 2.5rem 0 0;
+		text-align: center;
+	}
+</style>

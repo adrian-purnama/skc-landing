@@ -1,0 +1,200 @@
+---
+import { workflow } from '../../data/workflow';
+import SectionHeading from '../ui/SectionHeading.astro';
+
+const count = workflow.steps.length;
+const gap = 100;
+const mid = 50;
+const amp = 18;
+const boxWidth = count * gap;
+const boxHeight = 100;
+
+function yAt(index: number): number {
+	return mid - amp * Math.cos(index * Math.PI);
+}
+
+const samples = Math.max(1, count - 1) * 32;
+const commands: string[] = [];
+for (let sample = 0; sample <= samples; sample += 1) {
+	const t = sample / samples;
+	const x = gap / 2 + t * (count - 1) * gap;
+	const y = mid - amp * Math.cos(t * (count - 1) * Math.PI);
+	commands.push(`${sample === 0 ? 'M' : 'L'}${x.toFixed(2)} ${y.toFixed(2)}`);
+}
+const wavePath = commands.join(' ');
+---
+
+<section id="workflow" aria-labelledby="workflow-heading">
+	<div class="stage">
+		<div class="wrap">
+			<SectionHeading id="workflow-heading" title={workflow.title} />
+		</div>
+		<div class="viewport" data-workflow-viewport>
+			<div class="flow" data-workflow-track>
+				<div class="lane">
+					<svg
+						class="wave"
+						viewBox={`0 0 ${boxWidth} ${boxHeight}`}
+						preserveAspectRatio="none"
+						aria-hidden="true"
+					>
+						<path d={wavePath} />
+					</svg>
+					<ol>
+						{
+							workflow.steps.map((step, index) => (
+								<li class="stop" tabindex="0">
+									<div class="marker">
+										<span class="point" style={`top: ${yAt(index)}%`} aria-hidden="true" />
+									</div>
+									<div class="copy">
+										<p class="num">{String(index + 1).padStart(2, '0')}</p>
+										<h3>{step.title}</h3>
+										<p class="text-muted">{step.text}</p>
+									</div>
+								</li>
+							))
+						}
+					</ol>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+	import { startWorkflowScroll } from '../../scripts/workflow-scroll';
+
+	const section = document.getElementById('workflow');
+	if (section) startWorkflowScroll(section);
+</script>
+
+<style>
+	section {
+		padding-block: 0;
+	}
+
+	.stage {
+		position: relative;
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		gap: clamp(2rem, 5vh, 3.5rem);
+		height: 100dvh;
+		padding-top: 4.25rem;
+		padding-bottom: clamp(1.5rem, 4vh, 2.5rem);
+		overflow: hidden;
+	}
+
+	.viewport {
+		overflow: clip;
+	}
+
+	.flow {
+		--edge: clamp(1.25rem, 4vw, 2.5rem);
+		--pad: max(var(--edge), calc((100vw - 1200px) / 2 + var(--edge)));
+		width: max-content;
+		padding-inline: var(--pad);
+	}
+
+	.lane {
+		position: relative;
+	}
+
+	.wave {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 9rem;
+		overflow: visible;
+	}
+
+	.wave path {
+		fill: none;
+		stroke: var(--color-accent);
+		stroke-width: 2;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		vector-effect: non-scaling-stroke;
+	}
+
+	.flow ol {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.stop {
+		--active: 0;
+		display: flex;
+		flex-direction: column;
+		flex: 0 0 min(88vw, 28rem);
+		outline-offset: 4px;
+	}
+
+	.stop:first-child {
+		--active: 1;
+	}
+
+	.marker {
+		position: relative;
+		height: 9rem;
+	}
+
+	.point {
+		position: absolute;
+		left: 50%;
+		z-index: 1;
+		width: 1.15rem;
+		height: 1.15rem;
+		border-radius: 50%;
+		background: var(--color-surface);
+		border: 3px solid var(--color-accent);
+		transform: translate(-50%, -50%) scale(calc(1 + var(--active) * 0.45));
+		box-shadow: 0 0 0 calc(var(--active) * 7px) color-mix(in srgb, var(--color-accent) 22%, transparent);
+	}
+
+	.copy {
+		width: min(22rem, 92%);
+		margin-inline: auto;
+		padding: 2rem 0 0;
+		text-align: center;
+		opacity: calc(0.72 + var(--active) * 0.28);
+	}
+
+	.num {
+		margin: 0 0 0.45rem;
+		font-size: 0.9375rem;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		color: var(--color-accent);
+	}
+
+	.stop h3 {
+		font-size: clamp(1.35rem, 2vw, 1.75rem);
+		line-height: 1.2;
+	}
+
+	.stop p.text-muted {
+		margin-top: 0.55rem;
+		font-size: 1.0625rem;
+	}
+
+	@media (min-width: 54rem) {
+		.stop {
+			flex-basis: clamp(28rem, 42vw, 38rem);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.viewport {
+			overflow-x: auto;
+			overflow-y: hidden;
+		}
+	}
+</style>

@@ -1,0 +1,62 @@
+---
+import LogoCard from './LogoCard.astro';
+import type { Project } from '../../lib/projects';
+
+interface Props {
+	project: Project;
+}
+
+const { project } = Astro.props;
+---
+
+<a class="item" href={project.href} data-reveal>
+	<LogoCard logo={project.logo} image={project.card}>
+		<span class="meta">
+			<b>{project.title}</b>
+			<span>{project.category.label} · {project.place}</span>
+		</span>
+	</LogoCard>
+</a>
+
+<style>
+	.item {
+		position: relative;
+		display: block;
+		aspect-ratio: 16 / 10;
+		color: inherit;
+		text-decoration: none;
+	}
+
+	.item :global(.card) {
+		position: absolute;
+		inset: 0;
+		height: auto;
+		aspect-ratio: auto;
+		margin: 0;
+		padding: 0;
+	}
+
+	.meta {
+		position: absolute;
+		inset: auto 0 0 0;
+		z-index: 2;
+		display: flex;
+		flex-direction: column;
+		gap: 0.12rem;
+		padding: 1.75rem 1.05rem 0.8rem;
+		background: linear-gradient(transparent, rgb(255 255 255 / 0.96) 52%);
+		pointer-events: none;
+	}
+
+	.meta b {
+		color: var(--color-heading);
+		font-size: 1.0625rem;
+		font-weight: 600;
+		line-height: 1.25;
+	}
+
+	.meta span {
+		color: var(--color-muted);
+		font-size: 0.875rem;
+	}
+</style>

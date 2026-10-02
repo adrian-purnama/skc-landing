@@ -1,0 +1,53 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { categories } from '../../data/categories';
+import { loadProjects, projectsInCategory } from '../../lib/projects';
+import CategoryFilters from '../../components/ui/CategoryFilters.astro';
+import ProjectCard from '../../components/ui/ProjectCard.astro';
+import ProjectGrid from '../../components/ui/ProjectGrid.astro';
+
+const projects = loadProjects();
+const groups = categories
+	.map((category) => ({
+		category,
+		projects: projectsInCategory(projects, category.slug),
+	}))
+	.filter((group) => group.projects.length > 0);
+---
+
+<Layout
+	title="Signage Projects   MARQ | Sumber Kreasi Cemerlang"
+	description="Browse MARQ (Sumber Kreasi Cemerlang) signage projects across healthcare, education, commercial retail, property, hospitality, and public landmarks in Indonesia."
+>
+	<section class="section-soft" aria-labelledby="all-projects-heading">
+		<div class="wrap">
+			<h1 id="all-projects-heading" data-reveal>Projects</h1>
+			<div data-reveal>
+				<CategoryFilters current="all" />
+			</div>
+			{
+				groups.map((group) => (
+					<section class="group" aria-labelledby={`cat-${group.category.slug}`}>
+						<h2 id={`cat-${group.category.slug}`} data-reveal>{group.category.label}</h2>
+						<ProjectGrid>
+							{group.projects.map((project) => (
+								<ProjectCard project={project} />
+							))}
+						</ProjectGrid>
+					</section>
+				))
+			}
+		</div>
+	</section>
+</Layout>
+
+<style>
+	.group {
+		padding-block: 0;
+		margin-top: 2.5rem;
+	}
+
+	.group h2 {
+		font-size: clamp(1.5rem, 3vw, 2rem);
+	}
+</style>

@@ -1,0 +1,28 @@
+<div class="grid">
+	<slot />
+</div>
+
+<style>
+	.grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1rem;
+		margin-top: 2.25rem;
+	}
+
+	.grid > :global(*) {
+		min-width: 0;
+	}
+
+	@media (min-width: 37.5rem) {
+		.grid {
+			grid-template-columns: 1fr 1fr;
+		}
+	}
+
+	@media (min-width: 60rem) {
+		.grid {
+			grid-template-columns: repeat(3, 1fr);
+		}
+	}
+</style>

@@ -1,0 +1,80 @@
+---
+import { logoGroups } from '../../data/clients';
+import { clientsIntro } from '../../data/site';
+import SectionHeading from '../ui/SectionHeading.astro';
+---
+
+<section class="section-soft" id="clients" aria-labelledby="clients-heading">
+	<div class="wrap">
+		<SectionHeading
+			id="clients-heading"
+			title={clientsIntro.title}
+			lede={clientsIntro.lede}
+			layout="center"
+		/>
+		{
+			logoGroups.map((group) => (
+				<div class="logo-group" data-reveal>
+					<h3>{group.title}</h3>
+					<ul class="logo-list">
+						{group.logos.map((logo) => (
+							<li>
+								<img src={logo.src} alt={logo.alt} loading="lazy" width="200" height="100" />
+							</li>
+						))}
+					</ul>
+				</div>
+			))
+		}
+	</div>
+</section>
+
+<style>
+	.logo-group {
+		margin-top: 2.75rem;
+		padding-top: 2.75rem;
+		border-top: 1px solid var(--color-border);
+		text-align: center;
+	}
+
+	.logo-group:first-of-type {
+		margin-top: 2.75rem;
+		padding-top: 0;
+		border-top: none;
+	}
+
+	.logo-group h3 {
+		margin-bottom: 1.25rem;
+		font-size: 0.9375rem;
+		font-weight: 600;
+		color: var(--color-muted);
+	}
+
+	.logo-list {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		align-items: center;
+		gap: 1.5rem 2rem;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.logo-list li {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 11rem;
+		min-height: 6.5rem;
+		padding: 0.5rem;
+	}
+
+	.logo-list img {
+		width: auto;
+		max-width: 100%;
+		height: auto;
+		max-height: 5.5rem;
+		object-fit: contain;
+	}
+</style>

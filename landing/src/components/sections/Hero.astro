@@ -1,0 +1,295 @@
+---
+import { readdirSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { hero } from '../../data/site';
+import Button from '../ui/Button.astro';
+
+const heroDir = join(dirname(fileURLToPath(import.meta.url)), '../../../public/hero');
+const slides = readdirSync(heroDir)
+	.filter((name) => /\.(avif|gif|jpe?g|png|webp)$/i.test(name))
+	.sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
+	.map((name) => `/hero/${encodeURIComponent(name)}`);
+
+const photos = slides.length > 0 ? slides : [hero.image.src ?? '/placeholder.png'];
+---
+
+<section class="hero" id="top" aria-labelledby="hero-heading">
+	<div class="wrap layout">
+		<div class="copy">
+			<h1 id="hero-heading">{hero.title}</h1>
+			<p class="lede">{hero.lede}</p>
+			<div class="ctas">
+				<Button href={hero.primaryCta.href}>{hero.primaryCta.label}</Button>
+				<Button href={hero.secondaryCta.href} variant="outline">{hero.secondaryCta.label}</Button>
+			</div>
+			<div class="stats">
+				{
+					hero.stats.map((stat) => (
+						<div>
+							<b>{stat.value}</b>
+							<span class="text-muted">{stat.label}</span>
+						</div>
+					))
+				}
+			</div>
+		</div>
+		<div class="visual">
+			<div class="photo" data-hero-slides>
+				{
+					photos.map((src, index) => (
+						<img
+							src={src}
+							alt={index === 0 ? hero.image.alt : ''}
+							class={index === 0 ? 'is-on' : undefined}
+							fetchpriority={index === 0 ? 'high' : 'low'}
+							decoding="async"
+						/>
+					))
+				}
+			</div>
+			<span class="shape shape-a" aria-hidden="true"></span>
+			<span class="shape shape-b" aria-hidden="true"></span>
+		</div>
+	</div>
+</section>
+
+<script>
+	const holdMs = 6500;
+	const fadeMs = 1600;
+	const root = document.querySelector('[data-hero-slides]');
+
+	if (root instanceof HTMLElement && root.dataset.ready !== 'true') {
+		root.dataset.ready = 'true';
+		const slides = [...root.querySelectorAll('img')];
+		const motion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+		if (slides.length > 1 && !motion) {
+			let current = 0;
+			slides[0]?.style.setProperty('z-index', '1');
+
+			window.setInterval(() => {
+				const previous = slides[current];
+				current = (current + 1) % slides.length;
+				const next = slides[current];
+				if (!previous || !next) return;
+
+				next.style.setProperty('z-index', '2');
+				next.classList.add('is-on');
+				window.setTimeout(() => {
+					previous.classList.remove('is-on');
+					previous.style.setProperty('z-index', '0');
+					next.style.setProperty('z-index', '1');
+				}, fadeMs);
+			}, holdMs);
+		}
+	}
+</script>
+
+<style>
+	.hero {
+		position: relative;
+		padding: 0;
+		overflow: hidden;
+		background: var(--color-surface);
+	}
+
+
+	.layout {
+		display: grid;
+		grid-template-columns: 1.05fr 1fr;
+		gap: clamp(1.5rem, 4vw, 3.5rem);
+		align-items: center;
+		min-height: min(51.25rem, calc(100svh - 4.25rem));
+		padding-top: 3rem;
+		padding-bottom: 3.5rem;
+	}
+
+	.hero h1 {
+		max-width: 11em;
+		font-size: 3rem !important;
+		font-weight: 600;
+		letter-spacing: -0.03em;
+		line-height: 1.02;
+	}
+
+	.lede {
+		max-width: 34em;
+		margin-top: .2rem;
+		font-size: .9rem !important;
+		color: var(--color-body);
+		line-spacing : .1rem;
+	}
+
+	.ctas {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.75rem;
+		margin-top: 2rem;
+	}
+
+	.stats {
+		display: flex;
+		gap: clamp(1.75rem, 5vw, 4rem);
+		margin-top: 3rem;
+		padding-top: 1.75rem;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.stats b {
+		display: block;
+		font-weight: 300;
+		font-size: clamp(2.5rem, 4.5vw, 3.5rem);
+		line-height: 1;
+		color: var(--color-accent);
+	}
+
+	.stats span {
+		font-size: 0.875rem;
+	}
+
+	.visual {
+		position: relative;
+		height: clamp(26.25rem, 62vh, 40rem);
+	}
+
+	.photo {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
+		clip-path: polygon(22% 0, 100% 0, 100% 100%, 0 100%);
+	}
+
+	.photo img {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		max-width: none;
+		object-fit: cover;
+		object-position: 40% 30%;
+		opacity: 0;
+		transition: opacity 1.6s ease-in-out;
+	}
+
+	.photo img.is-on {
+		opacity: 1;
+	}
+
+	.shape {
+		position: absolute;
+		border-radius: 1.75rem;
+		transform: skewX(-30deg);
+		pointer-events: none;
+	}
+
+	.shape-a {
+		width: 5.75rem;
+		height: 15.625rem;
+		left: 2%;
+		top: -2.5rem;
+		background: linear-gradient(180deg, #8e8aae, #c8c9d0);
+		opacity: 0.9;
+	}
+
+	.shape-b {
+		width: 5rem;
+		height: 11.875rem;
+		right: -10%;
+		bottom: -1.875rem;
+		background: linear-gradient(180deg, #1e2a63, var(--color-primary));
+	}
+
+	.tag {
+		position: absolute;
+		right: 1rem;
+		bottom: 1rem;
+		padding: 0.5rem 0.875rem;
+		border-radius: 999px;
+		background: rgb(15 20 38 / 0.78);
+		color: #fff;
+		font-size: 0.8125rem;
+		backdrop-filter: blur(6px);
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.shape-a {
+			animation: slide-a 1s cubic-bezier(0.2, 0.8, 0.2, 1) both 0.1s;
+		}
+
+		.shape-b {
+			animation: slide-b 1s cubic-bezier(0.2, 0.8, 0.2, 1) both 0.25s;
+		}
+
+		.photo {
+			animation: reveal 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+		}
+
+		@keyframes slide-a {
+			from {
+				transform: skewX(-30deg) translateY(-120%);
+			}
+		}
+
+		@keyframes slide-b {
+			from {
+				transform: skewX(-30deg) translateY(120%);
+			}
+		}
+
+		@keyframes reveal {
+			from {
+				clip-path: polygon(100% 0, 100% 0, 100% 100%, 78% 100%);
+			}
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.photo img {
+			transition: none;
+		}
+	}
+
+	@media (max-width: 53.75rem) {
+		.layout {
+			grid-template-columns: 1fr;
+			min-height: 0;
+			padding-top: 1.5rem;
+		}
+
+		.copy {
+			/* Room for the floating 3D MARQ above the headline */
+			padding-top: 5.5rem;
+		}
+
+		.hero h1 {
+			max-width: 10em;
+			font-size: 2.35rem !important;
+		}
+
+		.visual {
+			height: 21.25rem;
+			order: -1;
+			margin-inline: calc(-1 * clamp(1.25rem, 4vw, 2.5rem));
+		}
+
+		.photo {
+			clip-path: polygon(14% 0, 100% 0, 100% 100%, 0 100%);
+		}
+
+		.shape-a {
+			width: 3.25rem;
+			height: 8.75rem;
+			left: 4%;
+			top: -1.875rem;
+		}
+
+		.shape-b {
+			width: 2.75rem;
+			height: 6.875rem;
+			left: auto;
+			right: 4%;
+			bottom: -0.625rem;
+		}
+	}
+</style>

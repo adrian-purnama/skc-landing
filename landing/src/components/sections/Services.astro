@@ -1,0 +1,17 @@
+---
+import { services, servicesIntro } from '../../data/services';
+import SectionHeading from '../ui/SectionHeading.astro';
+import Tabs from '../ui/Tabs.astro';
+---
+
+<section class="section-dark" id="services" aria-labelledby="services-heading">
+	<div class="wrap">
+		<SectionHeading
+			id="services-heading"
+			title={servicesIntro.title}
+			lede={servicesIntro.lede}
+			layout="split"
+		/>
+		<Tabs tabs={services} label="Services" />
+	</div>
+</section>

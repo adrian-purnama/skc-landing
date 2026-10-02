@@ -1,0 +1,166 @@
+---
+import { nav, quoteHref, site } from '../../data/site';
+import Button from '../ui/Button.astro';
+---
+
+<header class="site-header">
+	<div class="wrap inner">
+		<a href="/#top" class="wordmark">
+			<img src="/marq%20logo.svg" alt="MARQ home" width="252" height="75" />
+		</a>
+		<span class="co">{site.legalName}</span>
+		<input id="nav-toggle" class="nav-toggle visually-hidden" type="checkbox" aria-controls="menu" />
+		<label for="nav-toggle" class="menu-btn">
+			<span class="visually-hidden">Open menu</span>
+			<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+				<path d="M3 6h14M3 14h14"></path>
+			</svg>
+		</label>
+		<nav id="menu" aria-label="Main">
+			<ul>
+				{
+					nav.map((item) => (
+						<li>
+							<a href={item.href}>{item.label}</a>
+						</li>
+					))
+				}
+			</ul>
+		</nav>
+		<Button href={quoteHref} class="quote">Request a quote</Button>
+	</div>
+</header>
+
+<style>
+	.site-header {
+		position: sticky;
+		top: env(safe-area-inset-top, 0px);
+		z-index: 50;
+		background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+		backdrop-filter: blur(10px);
+		border-bottom: 1px solid var(--color-border);
+	}
+
+	.inner {
+		display: flex;
+		align-items: center;
+		gap: 1.5rem;
+		min-height: 4.25rem;
+	}
+
+	.wordmark {
+		display: flex;
+		align-items: center;
+		flex-shrink: 0;
+		line-height: 0;
+		text-decoration: none;
+	}
+
+	.wordmark img {
+		height: 2rem;
+		width: auto;
+	}
+
+	.co {
+		display: none;
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.04em;
+		color: var(--color-muted);
+		border-left: 1px solid var(--color-border);
+		padding-left: 0.875rem;
+		margin-left: -0.5rem;
+		white-space: nowrap;
+	}
+
+	.nav-toggle:focus-visible + .menu-btn {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 3px;
+	}
+
+	.menu-btn {
+		display: grid;
+		place-items: center;
+		margin-left: auto;
+		width: 2.75rem;
+		height: 2.75rem;
+		color: var(--color-heading);
+		background: transparent;
+		border: 1.5px solid var(--color-border);
+		border-radius: 0.625rem;
+		cursor: pointer;
+	}
+
+	nav {
+		display: none;
+		position: absolute;
+		left: 0;
+		right: 0;
+		top: 100%;
+		background: var(--color-surface);
+		border-bottom: 1px solid var(--color-border);
+		padding: 0.5rem clamp(1.25rem, 4vw, 2.5rem) 1.25rem;
+	}
+
+	.nav-toggle:checked ~ nav {
+		display: block;
+	}
+
+	nav ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+	}
+
+	nav a {
+		display: block;
+		padding: 0.75rem 0;
+		font-size: 1.125rem;
+		font-weight: 500;
+		color: var(--color-heading);
+		text-decoration: none;
+	}
+
+	nav a:hover {
+		color: var(--color-accent);
+	}
+
+	:global(a.quote) {
+		display: none;
+	}
+
+	@media (min-width: 57.5rem) {
+		.co {
+			display: block;
+		}
+
+		.menu-btn {
+			display: none;
+		}
+
+		nav {
+			display: block;
+			position: static;
+			margin-left: auto;
+			background: transparent;
+			border: 0;
+			padding: 0;
+		}
+
+		nav ul {
+			flex-direction: row;
+			gap: 1.75rem;
+		}
+
+		nav a {
+			padding: 0;
+			font-size: 0.9375rem;
+		}
+
+		:global(a.quote) {
+			display: inline-block;
+		}
+	}
+</style>

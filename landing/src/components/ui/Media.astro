@@ -1,0 +1,23 @@
+---
+interface Props {
+	image: { src?: string; alt: string };
+	width: number;
+	height: number;
+	loading?: 'eager' | 'lazy';
+	fetchpriority?: 'high' | 'low' | 'auto';
+	class?: string;
+}
+
+const { image, width, height, loading = 'lazy', fetchpriority, class: className } = Astro.props;
+const src = image.src ?? '/placeholder.png';
+---
+
+<img
+	src={src}
+	alt={image.alt}
+	width={width}
+	height={height}
+	loading={loading}
+	fetchpriority={fetchpriority}
+	class={className}
+/>

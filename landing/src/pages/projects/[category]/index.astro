@@ -1,0 +1,60 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { categories, type Category } from '../../../data/categories';
+import { loadProjects, projectsInCategory, type Project } from '../../../lib/projects';
+import CategoryFilters from '../../../components/ui/CategoryFilters.astro';
+import ProjectCard from '../../../components/ui/ProjectCard.astro';
+import ProjectGrid from '../../../components/ui/ProjectGrid.astro';
+
+export function getStaticPaths() {
+	const projects = loadProjects();
+	return categories.map((category) => ({
+		params: { category: category.slug },
+		props: {
+			category,
+			projects: projectsInCategory(projects, category.slug),
+			total: projects.length,
+		},
+	}));
+}
+
+interface Props {
+	category: Category;
+	projects: Project[];
+	total: number;
+}
+
+const { category, projects, total } = Astro.props;
+---
+
+<Layout
+	title={`${category.label} Signage Projects by MARQ (Sumber Kreasi Cemerlang)`}
+	description={`${category.label} signage design, fabrication, and installation projects by MARQ   PT Sumber Kreasi Cemerlang.`}
+>
+	<section class="section-soft" aria-labelledby="category-heading">
+		<div class="wrap">
+			<h1 id="category-heading" data-reveal>{category.label}</h1>
+			<div data-reveal>
+				<CategoryFilters current={category.slug} />
+			</div>
+			<p class="count text-muted" data-reveal>Showing {projects.length} of {total} projects</p>
+			{
+				projects.length > 0 ? (
+					<ProjectGrid>
+						{projects.map((project) => (
+							<ProjectCard project={project} />
+						))}
+					</ProjectGrid>
+				) : (
+					<p class="empty text-muted">No projects in this category yet.</p>
+				)
+			}
+		</div>
+	</section>
+</Layout>
+
+<style>
+	.empty {
+		margin-top: 2rem;
+	}
+</style>
