@@ -1,9 +1,10 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, extname, join, relative, sep } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { categories, getCategory, type Category } from '../data/categories';
 
-const publicDir = fileURLToPath(new URL('../../public', import.meta.url));
+// Resolve from process.cwd() (Astro project root). import.meta.url breaks after Vite
+// bundles this module for the static build, so readdir would silently return [].
+const publicDir = join(process.cwd(), 'public');
 const projectsDir = join(publicDir, 'projects');
 
 const imageExtensions = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg', '.avif']);
